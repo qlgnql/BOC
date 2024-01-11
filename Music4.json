@@ -1,0 +1,454 @@
+{
+  "Music": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "76"
+          },
+          "title": {
+            "S": "사랑..그게 뭔데"
+          },
+          "artist": {
+            "S": "지아"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "77"
+          },
+          "title": {
+            "S": "나에게 그대만이"
+          },
+          "artist": {
+            "S": "탑현"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "78"
+          },
+          "title": {
+            "S": "봄날"
+          },
+          "artist": {
+            "S": "방탄소년단"
+          },
+          "genre": {
+            "S": "Rap/Hip-Hop"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "79"
+          },
+          "title": {
+            "S": "다시 만날 수 있을까"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "80"
+          },
+          "title": {
+            "S": "UNFORGIVEN (feat. Nile Rodgers)"
+          },
+          "artist": {
+            "S": "LE SSERAFIM (르세라핌)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "81"
+          },
+          "title": {
+            "S": "이제 나만 믿어요"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "82"
+          },
+          "title": {
+            "S": "MANIAC"
+          },
+          "artist": {
+            "S": "VIVIZ (비비지)"
+          },
+          "genre": {
+            "S": "R&B/Soul, Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "83"
+          },
+          "title": {
+            "S": "Butter"
+          },
+          "artist": {
+            "S": "방탄소년단"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "84"
+          },
+          "title": {
+            "S": "그대가 내 안에 박혔다(그내박)"
+          },
+          "artist": {
+            "S": "순순희(기태)"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "85"
+          },
+          "title": {
+            "S": "밤, 바다"
+          },
+          "artist": {
+            "S": "최유리"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "86"
+          },
+          "title": {
+            "S": "무지개"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Rock/Metal"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "87"
+          },
+          "title": {
+            "S": "Summer (Feat. BE’O (비오))"
+          },
+          "artist": {
+            "S": "Paul Blanco"
+          },
+          "genre": {
+            "S": "Rap/Hip-Hop"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "88"
+          },
+          "title": {
+            "S": "Must Have Love"
+          },
+          "artist": {
+            "S": "SG 워너비, 브라운아이드걸스"
+          },
+          "genre": {
+            "S": "R&B/Soul"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "89"
+          },
+          "title": {
+            "S": "Merry PLLIstmas"
+          },
+          "artist": {
+            "S": "PLAVE"
+          },
+          "genre": {
+            "S": "R&B/Soul"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "90"
+          },
+          "title": {
+            "S": "아버지"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "91"
+          },
+          "title": {
+            "S": "London Boy"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Rock/Metal"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "92"
+          },
+          "title": {
+            "S": "STAY"
+          },
+          "artist": {
+            "S": "The Kid LAROI, Justin Bieber"
+          },
+          "genre": {
+            "S": "POP"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "93"
+          },
+          "title": {
+            "S": "건물 사이에 피어난 장미 (Rose Blossom)"
+          },
+          "artist": {
+            "S": "H1-KEY (하이키)"
+          },
+          "genre": {
+            "S": "Dance, Rap/Hip-Hop"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "94"
+          },
+          "title": {
+            "S": " 3D (feat. Jack Harlow)"
+          },
+          "artist": {
+            "S": "정국, Jack Harlow"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "95"
+          },
+          "title": {
+            "S": "숲"
+          },
+          "artist": {
+            "S": "최유리"
+          },
+          "genre": {
+            "S": "Indie"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "96"
+          },
+          "title": {
+            "S": "Polaroid"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Rock/Metal"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "97"
+          },
+          "title": {
+            "S": "예뻤어"
+          },
+          "artist": {
+            "S": "DAY6 (데이식스)"
+          },
+          "genre": {
+            "S": "Rock/Metal"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "98"
+          },
+          "title": {
+            "S": "인생찬가"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "99"
+          },
+          "title": {
+            "S": "입술 (Feat. 10CM)"
+          },
+          "artist": {
+            "S": "헤이즈 (Heize)"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "100"
+          },
+          "title": {
+            "S": "꽃"
+          },
+          "artist": {
+            "S": "지수 (JISOO)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    }
+  ]
+}

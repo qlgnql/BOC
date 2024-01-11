@@ -1,0 +1,1644 @@
+AWSTemplateFormatVersion: 2010-09-09
+# 클라우드포메이션 stack에 개별 출력(output) 내용 / 2023-12-27 주석 추가
+Outputs:
+  personalizeStackPersonalizebucketS3:
+    Description: >-
+      S3 Bucket to upload and store user-interaction json file and preprocessed
+      csv file
+    Value: !Ref PersonalizeBucket
+  personalizeStackPersonalizeBatchbucketS3:
+    Description: >-
+      Personalize Batch job update the result to this S3 bucket
+    Value: !Ref PersonalizeBatchBucket
+  APIEndpoint:
+    Description: API Gateway endpoint for Recommendation
+    Value: !Sub >-
+      https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+  CfDistributionDomainName:
+    Description: 'Domain name for our cloudfront distribution'
+    Value: !GetAtt CfDistribution.DomainName
+  # S3CopyCLIForLAB3:
+  #   Description: Amazon S3 Bucket copy cli for LAB 3
+  #   Value: !Sub >-
+  #     aws s3 cp ~/work/Infra/Infra/beatoncloud-click-source-data.parquet s3://${PersonalizeBucket}/beatoncloud-click-source-data.parquet
+  # S3CopyCLIForLAB5:
+  #   Description: Amazon S3 Bucket copy cli for LAB 5
+  #   Value: !Sub >-
+  #     aws s3 cp ~/work/Infra/Infra/beatoncloud-click-stream-data.parquet s3://${PersonalizeBucket}/beatoncloud-click-stream-data.parquet
+  # DeploytoCloudFront:
+  #   Description: Deploy react application to S3 for static web hosting
+  #   Value: !Sub >-
+  #     aws s3 sync ~/work/Infra/Infra/build s3://${S3Bucket}
+
+# 클라우드포메이션 stack에 대한 description / 2023-12-27 주석 추가
+Description: beatoncloud-personalize
+
+# 클라우드포메이션 stack에 대한 resource / 2023-12-27 주석 추가
+Description: "Creates an AWS WAF configuration that protects against common attacks and sets up S3 bucket and CloudFront distribution"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Web ACL Name for Common Attack Protection"
+        Parameters:
+          - WebACLName
+    ParameterLabels:
+      WebACLName:
+        default: "Name"
+Parameters:
+  WebACLName:
+    Type: "String"
+    Default: "CommonAttackProtection"
+    Description: "Enter the name you want to use for the WebACL. This value is also added as a prefix for the names of the rules, conditions, and CloudWatch metrics created by this template."
+
+Resources:
+  MyWebACL:
+    Properties:
+      Name: !Ref WebACLName
+      DefaultAction:
+        Type: "ALLOW"
+      MetricName: !Ref WebACLName
+      Rules:
+        - Action:
+            Type: "BLOCK"
+          Priority: 1
+          RuleId:
+            Ref: "ManualIPBlockRule"
+        - Action:
+            Type: "COUNT"
+          Priority: 2
+          RuleId:
+            Ref: "SizeMatchRule"
+        - Action:
+            Type: "BLOCK"
+          Priority: 3
+          RuleId:
+            Ref: "SqliRule"
+        - Action:
+            Type: "BLOCK"
+          Priority: 4
+          RuleId:
+            Ref: "XssRule"
+    Type: "AWS::WAF::WebACL"
+
+  SqliRule:
+    Properties:
+      Name: !Join ["", [!Ref WebACLName, "SqliRule"]]
+      MetricName: !Join ["", [{ "Ref" : WebACLName }, "SqliRule"]]
+      Predicates:
+        - DataId:
+            Ref: "SqliMatchSet"
+          Negated: false
+          Type: "SqlInjectionMatch"
+    Type: "AWS::WAF::Rule"
+
+  XssRule:
+    Properties:
+      Name: !Join ["", [{ "Ref" : WebACLName }, "XssRule"]]
+      MetricName: !Join ["", [{ "Ref" : WebACLName }, "XssRule"]]
+      Predicates:
+        - DataId:
+            Ref: "XssMatchSet"
+          Negated: false
+          Type: "XssMatch"
+    Type: "AWS::WAF::Rule"
+
+  SizeMatchRule:
+    Properties:
+      Name: !Join ["", [{ "Ref" : WebACLName }, "LargeBodyMatchRule"]]
+      MetricName: !Join ["", [{ "Ref" : WebACLName }, "DetectLargeBody"]]
+      Predicates:
+        - DataId:
+            Ref: "SizeMatchSet"
+          Negated: false
+          Type: "SizeConstraint"
+    Type: "AWS::WAF::Rule"
+
+  ManualIPBlockRule:
+    Properties:
+      Name: !Join ["", [{ "Ref" : WebACLName }, "ManualIPBlockRule"]]
+      MetricName: !Join ["", [{ "Ref" : WebACLName }, "ManualIPBlockRule"]]
+      Predicates:
+        - DataId:
+            Ref: "WAFManualIPBlockSet"
+          Negated: false
+          Type: "IPMatch"
+    Type: "AWS::WAF::Rule"
+
+  WAFManualIPBlockSet:
+    Properties:
+      Name: "Manual IP Block Set"
+    Type: "AWS::WAF::IPSet"
+
+  SizeMatchSet:
+    Properties:
+      Name: !Join ["", [{ "Ref" : WebACLName }, "LargeBodyMatch"]]
+      SizeConstraints:
+        - FieldToMatch:
+            Type: "BODY"
+          ComparisonOperator: "GT"
+          Size: "8192"
+          TextTransformation: "NONE"
+    Type: "AWS::WAF::SizeConstraintSet"
+
+  SqliMatchSet:
+    Properties:
+      Name: !Join ["", [{ "Ref" : WebACLName }, "SqliMatch"]]
+      SqlInjectionMatchTuples:
+        - FieldToMatch:
+            Type: "QUERY_STRING"
+          TextTransformation: "URL_DECODE"
+        - FieldToMatch:
+            Type: "QUERY_STRING"
+          TextTransformation: "HTML_ENTITY_DECODE"
+        - FieldToMatch:
+            Type: "BODY"
+          TextTransformation: "URL_DECODE"
+        - FieldToMatch:
+            Type: "BODY"
+          TextTransformation: "HTML_ENTITY_DECODE"
+        - FieldToMatch:
+            Type: "URI"
+          TextTransformation: "URL_DECODE"
+    Type: "AWS::WAF::SqlInjectionMatchSet"
+
+  XssMatchSet:
+    Properties:
+      Name: !Join ["", [{ "Ref" : WebACLName }, "XssMatch"]]
+      XssMatchTuples:
+        - FieldToMatch:
+            Type: "QUERY_STRING"
+          TextTransformation: "URL_DECODE"
+        - FieldToMatch:
+            Type: "QUERY_STRING"
+          TextTransformation: "HTML_ENTITY_DECODE"
+        - FieldToMatch:
+            Type: "BODY"
+          TextTransformation: "URL_DECODE"
+        - FieldToMatch:
+            Type: "BODY"
+          TextTransformation: "HTML_ENTITY_DECODE"
+        - FieldToMatch:
+            Type: "URI"
+          TextTransformation: "URL_DECODE"
+    Type: "AWS::WAF::XssMatchSet"
+
+  # S3 버킷 생성 / 2023-12-27 주석 추가
+  S3Bucket:
+    DeletionPolicy: 'Delete'
+    Metadata:
+      Comment: 'Bucket to store some data'
+    Properties:
+      AccessControl: 'Private'
+      BucketName: !Sub 'beatoncloud.com'
+    Type: 'AWS::S3::Bucket'
+
+  # S3에 대한 버킷 정책 생성 / 2023-12-27 주석 추가
+  S3BucketPolicy:
+    Metadata:
+      Comment: 'Bucket policy to allow CloudFront to access the data'
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 's3:GetObject'
+            Effect: 'Allow'
+            Principal:
+              CanonicalUser: !GetAtt CfOriginAccessIdentity.S3CanonicalUserId
+            Resource:
+              - !Sub 'arn:aws:s3:::${S3Bucket}/*'
+    Type: 'AWS::S3::BucketPolicy'
+
+  # CloudFront 배포 
+  CfDistribution:
+    Metadata:
+      Comment: 'A simple CloudFront distribution with an S3 origin'
+    Properties:
+      DistributionConfig:
+         # Aliases / 2023-12-29 주석, 내용 추가
+        Aliases: 
+          - 'beatoncloud.com'
+          - 'www.beatoncloud.com'
+        Comment: 'A simple distribution with an S3 origin'
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - 'HEAD'
+            - 'DELETE'
+            - 'POST'
+            - 'GET'
+            - 'OPTIONS'
+            - 'PUT'
+            - 'PATCH'
+          CachedMethods:
+            - 'HEAD'
+            - 'GET'
+          Compress: false
+          DefaultTTL: 86400
+          ForwardedValues:
+            Cookies:
+              Forward: 'none'
+            Headers:
+              - 'Origin'
+            QueryString: false
+          MaxTTL: 31536000
+          MinTTL: 86400
+          TargetOriginId: !Sub 's3-origin-${S3Bucket}'
+          ViewerProtocolPolicy: 'redirect-to-https'
+        DefaultRootObject: 'index.html'
+        Enabled: true
+        HttpVersion: 'http1.1'
+        IPV6Enabled: false
+        # ViewerCertificate 추가 및 기존 DomainName 코드 주석 처리 / 2023-12-29
+        ViewerCertificate:
+          AcmCertificateArn: !Sub "arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/48f5aaca-af0e-41f0-a4a2-e1aa6f9afc79"
+          SslSupportMethod: 'sni-only'
+          MinimumProtocolVersion: TLSv1.2_2021
+        Origins:
+          - DomainName: !GetAtt S3Bucket.RegionalDomainName
+            Id: !Sub 's3-origin-${S3Bucket}'
+            OriginPath: ''
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CfOriginAccessIdentity}'
+        PriceClass: 'PriceClass_All'
+        
+        # WAF WebACLId 연결
+        WebACLId: !Ref MyWebACL
+
+    Type: 'AWS::CloudFront::Distribution'
+
+  CfOriginAccessIdentity:
+    Metadata:
+      Comment: 'Access S3 bucket content only through CloudFront'
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'Access beatoncloud S3 bucket content only through CloudFront'
+    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+
+  MyRoute53Record:
+    Type: 'AWS::Route53::RecordSet'
+    Properties:
+      HostedZoneId: 'Z018845736534X2GGS016'  # Route 53 Hosted Zone ID를 입력하세요.
+      Name: !Sub '${S3Bucket}'    # CloudFront 배포의 도메인을 입력하세요.
+      Type: 'A'
+      AliasTarget:
+        DNSName: !GetAtt 'CfDistribution.DomainName'
+        HostedZoneId: 'Z2FDTNDATAQYW2'  # CloudFront의 고정 Hosted Zone ID
+
+  MyRoute53Record2:
+    Type: 'AWS::Route53::RecordSet'
+    Properties: 
+      HostedZoneId: 'Z018845736534X2GGS016'   # Route 53 Hosted Zone ID를 입력하세요.
+      Name: !Sub 'www.${S3Bucket}' # CloudFront 배포의 도메인을 입력하세요.
+      Type: 'A'
+      AliasTarget:
+        DNSName: !GetAtt 'CfDistribution.DomainName'
+        HostedZoneId: 'Z2FDTNDATAQYW2'  # CloudFront의 고정 Hosted Zone ID
+
+  KinesisProcessingFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: |
+        
+            import os
+            import json
+            import boto3
+            import base64
+
+            personalize_events = boto3.client(service_name='personalize-events')
+            trackingId = os.environ['TRACKING_ID']
+
+            def lambda_handler(event, context):
+                try:
+                    for record in event['Records']:
+                        # Kinesis data is base64 encoded so decode here
+                        payload = base64.b64decode(record['kinesis']['data']).decode('utf-8')
+
+                        # push_event_to_Personalize(json.loads(payload))
+                        body = json.loads(payload)
+                        response = personalize_events.put_events(
+                            trackingId = trackingId,
+                            userId = body['USER_ID'],
+                            sessionId = body['USER_ID'],
+                            eventList = [{
+                                'eventType': body['EVENT_TYPE'].upper(),
+                                'sentAt': str(int(body['TIMESTAMP'])/1000),
+                                'itemId': body['ITEM_ID']
+                            }]
+                        )
+                        
+                    return 'Successfully processed {} records.'.format(len(event['Records']))
+                except Exception as e:
+                    raise e
+                
+
+
+      FunctionName: kinesisProcessingFunction
+      Description: >-
+        Real time API from personalize
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+      Environment:
+        Variables:
+          TRACKING_ID: copynewtrackingIDFromEventTrack
+      Handler: index.lambda_handler
+      Role: !GetAtt 
+        - KinesisProcessingFunctionRole
+        - Arn
+      Runtime: python3.8
+
+  
+  KinesisProcessingFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - apigateway.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: KinesisProcessingFunctionRolePolicy0
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - 'logs:CreateLogGroup'
+                Resource: '*'
+                Effect: Allow
+              - Action:
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: 'arn:aws:logs:*:*:log-group:/aws/lambda-insights:*'
+                Effect: Allow
+        - PolicyName: KinesisProcessingFunctionRolePolicy1
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - 'kinesis:Get*'
+                  - 'kinesis:List*'
+                  - 'kinesis:Describe*'
+                  - 'kinesis:put*'
+                Resource: '*'
+                Effect: Allow
+        - PolicyName: KinesisProcessingFunctionRolePolicy2
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - 'personalize:*'
+                Resource: '*'
+                Effect: Allow
+        - PolicyName: KinesisProcessingFunctionRolePolicy3
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:UpdateItem'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:DescribeTable'
+                  - 'dynamodb:ConditionCheckItem'
+                Resource:
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}
+                    - tableName: !Ref MusicTable
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*
+                    - tableName: !Ref MusicTable
+                Effect: Allow
+        - PolicyName: KinesisProcessingFunctionRolePolicy4
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 's3:GetObject'
+                  - 's3:GetObjectAcl'
+                  - 's3:GetObjectVersion'
+                  - 's3:PutObject'
+                  - 's3:PutObjectAcl'
+                  - 's3:DeleteObject'
+                  - 's3:DeleteObjectTagging'
+                  - 's3:DeleteObjectVersionTagging'
+                  - 's3:GetObjectTagging'
+                  - 's3:GetObjectVersionTagging'
+                  - 's3:PutObjectTagging'
+                  - 's3:PutObjectVersionTagging'
+                Resource:
+                  - !Sub 
+                    - 'arn:${AWS::Partition}:s3:::${bucketName}/*'
+                    - bucketName: !Ref PersonalizeBucket
+                Effect: Allow
+              - Action:
+                  - 's3:ListBucket'
+                  - 's3:GetBucketLocation'
+                  - 's3:GetLifecycleConfiguration'
+                  - 's3:PutLifecycleConfiguration'
+                Resource:
+                  - !Sub 
+                    - 'arn:${AWS::Partition}:s3:::${bucketName}'
+                    - bucketName: !Ref PersonalizeBucket
+                Effect: Allow
+
+  KinesisStreamFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: |
+        
+            import json
+            import logging
+            import boto3
+            from botocore.exceptions import ClientError
+
+            logger = logging.getLogger(__name__)
+
+            kinesis = boto3.client("kinesis")
+
+            def put_record(name, data, partition_key):
+                try:
+                    response = kinesis.put_record(
+                        StreamName=name,
+                        Data=json.dumps(data),
+                        PartitionKey=partition_key)
+                except ClientError:
+                    logger.exception("Couldn't put record in stream %s.", name)
+                    raise
+                else:
+                    return response
+
+            def lambda_handler(event, context):
+                print(event)
+                
+                kinesis_stream = 'beatoncloud-kinesis-stream-prd'
+                partition_key = event["PartitionKey"]
+                data = event["Data"]
+                
+                response = put_record(kinesis_stream, data, partition_key)
+                
+                # TODO implement
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        "Content-Type" : "application/json",
+                        "Access-Control-Allow-Origin" : "*",
+                        "Allow" : "GET, OPTIONS, POST",
+                        "Access-Control-Allow-Methods" : "GET, OPTIONS, POST",
+                        "Access-Control-Allow-Headers" : "*"
+                    },
+                    'body': json.dumps(response)
+                }
+                
+
+
+      FunctionName: kinesisPutFunction
+      Description: >-
+        Real time API from personalize
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+      Environment:
+        Variables:
+          TRACKING_ID: fa718ea1-e638-40b1-ae13-58fd17f94eb9
+      Handler: index.lambda_handler
+      Role: !GetAtt 
+        - KinesisStreamFunctionRole
+        - Arn
+      Runtime: python3.8
+
+  
+  KinesisStreamFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - apigateway.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: KinesisStreamFunctionRolePolicy0
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - 'logs:CreateLogGroup'
+                Resource: '*'
+                Effect: Allow
+              - Action:
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: 'arn:aws:logs:*:*:log-group:/aws/lambda-insights:*'
+                Effect: Allow
+        - PolicyName: KinesisStreamFunctionRolePolicy1
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - 'kinesis:Get*'
+                  - 'kinesis:List*'
+                  - 'kinesis:Describe*'
+                  - 'kinesis:put*'
+                Resource: '*'
+                Effect: Allow
+        - PolicyName: RealtimeRecommendationFunctionRolePolicy3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - 'personalize:*'
+                Resource: '*'
+                Effect: Allow
+        - PolicyName: RealtimeRecommendationFunctionRolePolicy4
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:UpdateItem'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:DescribeTable'
+                  - 'dynamodb:ConditionCheckItem'
+                Resource:
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}
+                    - tableName: !Ref MusicTable
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*
+                    - tableName: !Ref MusicTable
+                Effect: Allow
+        - PolicyName: RealtimeRecommendationFunctionRolePolicy5
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 's3:GetObject'
+                  - 's3:GetObjectAcl'
+                  - 's3:GetObjectVersion'
+                  - 's3:PutObject'
+                  - 's3:PutObjectAcl'
+                  - 's3:DeleteObject'
+                  - 's3:DeleteObjectTagging'
+                  - 's3:DeleteObjectVersionTagging'
+                  - 's3:GetObjectTagging'
+                  - 's3:GetObjectVersionTagging'
+                  - 's3:PutObjectTagging'
+                  - 's3:PutObjectVersionTagging'
+                Resource:
+                  - !Sub 
+                    - 'arn:${AWS::Partition}:s3:::${bucketName}/*'
+                    - bucketName: !Ref PersonalizeBucket
+                Effect: Allow
+              - Action:
+                  - 's3:ListBucket'
+                  - 's3:GetBucketLocation'
+                  - 's3:GetLifecycleConfiguration'
+                  - 's3:PutLifecycleConfiguration'
+                Resource:
+                  - !Sub 
+                    - 'arn:${AWS::Partition}:s3:::${bucketName}'
+                    - bucketName: !Ref PersonalizeBucket
+                Effect: Allow
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+
+  
+  RealtimeRecommendationFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: |
+        
+            import os
+            import json
+            import boto3
+            from operator import itemgetter
+
+            campaignArn = os.environ['CAMPAIGN_ARN']
+            personalizeRt = boto3.client('personalize-runtime')
+            dynamodb = boto3.resource('dynamodb')
+
+            music_table = dynamodb.Table('Music')
+
+            def get_personalize_recommendations(userId):
+                response = personalizeRt.get_recommendations(
+                    campaignArn = campaignArn,
+                    userId = userId,
+                    numResults = 3
+                )
+                
+                return response
+                
+            def lambda_handler(event, context):
+                userId = event['pathParameters']['id']
+                response = get_personalize_recommendations(userId)
+                music_list = response['itemList']
+                
+                item_ids = []
+                
+                for music in music_list:
+                    item_ids.append(music['itemId'])
+                    
+                batch_keys = {
+                    music_table.name: {
+                        'Keys': [{'id': music['itemId']} for music in music_list],
+                        'ProjectionExpression': 'id, #name, category, imageUrl',
+                        'ExpressionAttributeNames': {'#name': 'name'}
+                    }
+                }
+                
+                response = dynamodb.batch_get_item(RequestItems=batch_keys)
+                recommendations = response['Responses']['Music']
+                
+                for recommendation in recommendations:
+                    for music in music_list:
+                        if recommendation['id'] == music['itemId']:
+                            recommendation['score'] = music['score']
+                            
+                recommendations = sorted(recommendations, key=itemgetter('score'), reverse=True)
+                
+                response = {
+                    'musics': recommendations
+                }
+                
+                return {
+                    'statusCode': 200,        
+                    'headers': {
+                        'Access-Control-Allow-Headers': 'Content-Type',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                    },
+                    'body': json.dumps(response)
+                }
+
+      FunctionName: personalizeProcessingFunction
+      Description: >-
+        Real time API from personalize
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+      Environment:
+        Variables:
+          CAMPAIGN_ARN: copyPasteCampaignARNHere
+      Handler: index.lambda_handler
+      Role: !GetAtt 
+        - RealtimeRecommendationFunctionRole
+        - Arn
+      Runtime: python3.8
+  # cloud9Environment:
+  #   Type: 'AWS::Cloud9::EnvironmentEC2'
+  #   Properties:
+  #     ImageId: amazonlinux-2023-x86_64
+  #     Repositories:
+  #       - RepositoryUrl: 'https://github.com/qlgnql/BOC'
+  #         PathComponent: personalizeworkshop
+  #     Description: Use this to work with Frontend application
+  #     InstanceType: t3.large
+  #     Name: personalizeworkshop
+  putItemFunctionApiPermissionProd:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref putItemFunction
+      SourceArn: !Sub 
+        - >-
+          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/music
+        - __Stage__: '*'
+          __ApiId__: !Ref ServerlessRestApi
+  getAllUserFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: |
+            
+            const tableName = process.env.SAMPLE_TABLE;
+
+            // Create a DocumentClient that represents the query to add an item
+            const dynamodb = require('aws-sdk/clients/dynamodb');
+            const docClient = new dynamodb.DocumentClient();
+
+            /**
+            * A simple example includes a HTTP get method to get all items from a DynamoDB table.
+            */
+            exports.getAllUsersHandler = async (event) => {
+                if (event.httpMethod !== 'GET') {
+                    throw new Error(`getAllItems only accept GET method, you tried: ${event.httpMethod}`);
+                }
+                // All log statements are written to CloudWatch
+                console.info('received:', event);
+
+                // get all items from the table (only first 1MB data, you can use `LastEvaluatedKey` to get the rest of data)
+                // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#scan-property
+                // https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Scan.html
+                var params = {
+                    TableName : tableName
+                };
+                const data = await docClient.scan(params).promise();
+                const items = data.Items;
+
+                const response = {
+                    statusCode: 200,
+                    headers: {
+                        'Access-Control-Allow-Headers': 'Content-Type',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                    },
+                    body: JSON.stringify(items)
+                };
+
+                // All log statements are written to CloudWatch
+                console.info(`response from: ${event.path} statusCode: ${response.statusCode} body: ${response.body}`);
+                return response;
+            }
+
+
+      FunctionName: getAllUserFunction  
+      Description: >-
+        A simple example includes a HTTP get method to get all users from a User
+        table.
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+      MemorySize: 128
+      Environment:
+        Variables:
+          SAMPLE_TABLE: !Ref UserTable
+      Handler: index.getAllUsersHandler
+      Role: !GetAtt 
+        - getAllUserFunctionRole
+        - Arn
+      Timeout: 100
+      Runtime: nodejs16.x
+  getAllItemsFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: |
+            // Create clients and set shared const values outside of the handler.
+
+            // Get the DynamoDB table name from environment variables
+            const tableName = process.env.SAMPLE_TABLE;
+
+            // Create a DocumentClient that represents the query to add an item
+            const dynamodb = require('aws-sdk/clients/dynamodb');
+            const docClient = new dynamodb.DocumentClient();
+
+            /**
+            * A simple example includes a HTTP get method to get all items from a DynamoDB table.
+            */
+            exports.getAllItemsHandler = async (event) => {
+                if (event.httpMethod !== 'GET') {
+                    throw new Error(`getAllItems only accept GET method, you tried: ${event.httpMethod}`);
+                }
+                // All log statements are written to CloudWatch
+                console.info('received:', event);
+
+                // get all items from the table (only first 1MB data, you can use `LastEvaluatedKey` to get the rest of data)
+                // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#scan-property
+                // https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Scan.html
+                var params = {
+                    TableName : tableName
+                };
+                const data = await docClient.scan(params).promise();
+                const items = data.Items;
+
+                const response = {
+                    statusCode: 200,
+                    headers: {
+                        'Access-Control-Allow-Headers': 'Content-Type',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                    },
+                    body: JSON.stringify(items)
+                };
+
+                // All log statements are written to CloudWatch
+                console.info(`response from: ${event.path} statusCode: ${response.statusCode} body: ${response.body}`);
+                return response;
+            }
+
+        
+      FunctionName: getAllMusicFunction  
+      Description: >-
+        A simple example includes a HTTP get method to get all items from a
+        DynamoDB table.
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+      MemorySize: 128
+      Environment:
+        Variables:
+          SAMPLE_TABLE: !Ref MusicTable
+      Handler: index.getAllItemsHandler
+      Role: !GetAtt 
+        - getAllItemsFunctionRole
+        - Arn
+      Timeout: 100
+      Runtime: nodejs16.x
+  getAllItemsFunctionApiPermissionProd:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref getAllItemsFunction
+      SourceArn: !Sub 
+        - >-
+          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/music
+        - __Stage__: '*'
+          __ApiId__: !Ref ServerlessRestApi
+  getAllItemsFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: getAllItemsFunctionRolePolicy0
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:UpdateItem'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:DescribeTable'
+                  - 'dynamodb:ConditionCheckItem'
+                Resource:
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}
+                    - tableName: !Ref MusicTable
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*
+                    - tableName: !Ref MusicTable
+                Effect: Allow
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+  BatchRecommendationFunctionApiPermissionProd:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref BatchRecommendationFunction
+      SourceArn: !Sub 
+        - >-
+          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/recommendation/batch/*
+        - __Stage__: '*'
+          __ApiId__: !Ref ServerlessRestApi
+  MusicTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      ProvisionedThroughput:
+        WriteCapacityUnits: 2
+        ReadCapacityUnits: 2
+      TableName: Music
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - KeyType: HASH
+          AttributeName: id
+
+
+  BatchTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      ProvisionedThroughput:
+        WriteCapacityUnits: 2
+        ReadCapacityUnits: 2
+      TableName: personalize-batch
+      AttributeDefinitions:
+        - AttributeName: user-id
+          AttributeType: N
+      KeySchema:
+        - KeyType: HASH
+          AttributeName: user-id
+
+
+  getByIdFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: |
+        
+            // Create clients and set shared const values outside of the handler.
+
+            // Get the DynamoDB table name from environment variables
+            const tableName = process.env.SAMPLE_TABLE;
+
+            // Create a DocumentClient that represents the query to add an item
+            const dynamodb = require('aws-sdk/clients/dynamodb');
+            const docClient = new dynamodb.DocumentClient();
+
+            /**
+            * A simple example includes a HTTP get method to get one item by id from a DynamoDB table.
+            */
+            exports.getByIdHandler = async (event) => {
+              if (event.httpMethod !== 'GET') {
+                throw new Error(`getMethod only accept GET method, you tried: ${event.httpMethod}`);
+              }
+              // All log statements are written to CloudWatch
+              console.info('received:', event);
+            
+              // Get id from pathParameters from APIGateway because of `/{id}` at template.yml
+              const id = event.pathParameters.id;
+            
+              // Get the item from the table
+              // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#get-property
+              var params = {
+                TableName : tableName,
+                Key: { id: id },
+              };
+              const data = await docClient.get(params).promise();
+              const item = data.Item;
+            
+              const response = {
+                statusCode: 200,
+                headers: {
+                        'Access-Control-Allow-Headers': 'Content-Type',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                    },
+                body: JSON.stringify(item)
+              };
+            
+              // All log statements are written to CloudWatch
+              console.info(`response from: ${event.path} statusCode: ${response.statusCode} body: ${response.body}`);
+              return response;
+            }
+
+      FunctionName: getMusicByIdFunction
+      Description: >-
+        A simple example includes a HTTP get method to get one item by id from a
+        DynamoDB table.
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+      MemorySize: 128
+      Environment:
+        Variables:
+          SAMPLE_TABLE: !Ref MusicTable
+      Handler: index.getByIdHandler
+      Role: !GetAtt 
+        - getByIdFunctionRole
+        - Arn
+      Timeout: 100
+      Runtime: nodejs16.x
+  getAllUserFunctionApiPermissionProd:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref getAllUserFunction
+      SourceArn: !Sub 
+        - >-
+          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/user
+        - __Stage__: '*'
+          __ApiId__: !Ref ServerlessRestApi
+  ServerlessRestApiDeployment5e9547a85c:
+    Type: 'AWS::ApiGateway::Deployment'
+    Properties:
+      RestApiId: !Ref ServerlessRestApi
+      Description: 'RestApi deployment id: 5e9547a85c88b6432d801236b6963dad7c96d148'
+      StageName: Stage
+  BatchRecommendationFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: |
+            
+            import boto3,json
+            dynamodb = boto3.resource('dynamodb')
+            table = dynamodb.Table('personalize-batch')
+            music_table = dynamodb.Table('Music')
+
+            def lambda_handler(event, context):
+                print(event)
+                userId = event['pathParameters']['id']
+                response = table.get_item(
+                    Key={
+                        'user-id' : int(userId)
+                    }
+                )
+
+                #print(response['Item']['item-list'])
+                music_list = response['Item']['item-list']
+                score_set = response['Item']['score-list']
+                score_list = list(score_set)
+
+                batch_keys = {
+                    music_table.name: {
+                        'Keys': [{'id': music} for music in music_list],
+                        'ProjectionExpression': 'id, #name, category, imageUrl',
+                        'ExpressionAttributeNames': {'#name': 'name'}
+                    }
+                }
+                bat_response = dynamodb.batch_get_item(RequestItems=batch_keys)
+                recommendations = bat_response['Responses']['Music']
+
+
+                for recommendation in recommendations:
+                    i=0;
+                    for music in music_list:
+                        if recommendation['id'] == music:
+                            recommendation['score'] = score_list[i]
+                        i = i+1
+
+                response = {
+                    'musics': recommendations
+                }
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Access-Control-Allow-Headers': 'Content-Type',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                    },
+                    'body': json.dumps(response)
+                }
+
+      FunctionName: batchRecommendationProcessingFunction 
+      Description: >-
+        Batch API from Personalize.
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+      Environment:
+        Variables:
+          CAMPAIGN_ARN: copyPasteCampaignARNHere
+      Handler: index.lambda_handler
+      Role: !GetAtt 
+        - BatchRecommendationFunctionRole
+        - Arn
+      Runtime: python3.8
+  RealtimeRecommendationFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: RealtimeRecommendationFunctionRolePolicy0
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - 'personalize:*'
+                Resource: '*'
+                Effect: Allow
+        - PolicyName: RealtimeRecommendationFunctionRolePolicy1
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:UpdateItem'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:DescribeTable'
+                  - 'dynamodb:ConditionCheckItem'
+                Resource:
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}
+                    - tableName: !Ref MusicTable
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*
+                    - tableName: !Ref MusicTable
+                Effect: Allow
+        - PolicyName: RealtimeRecommendationFunctionRolePolicy2
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 's3:GetObject'
+                  - 's3:GetObjectAcl'
+                  - 's3:GetObjectVersion'
+                  - 's3:PutObject'
+                  - 's3:PutObjectAcl'
+                  - 's3:DeleteObject'
+                  - 's3:DeleteObjectTagging'
+                  - 's3:DeleteObjectVersionTagging'
+                  - 's3:GetObjectTagging'
+                  - 's3:GetObjectVersionTagging'
+                  - 's3:PutObjectTagging'
+                  - 's3:PutObjectVersionTagging'
+                Resource:
+                  - !Sub 
+                    - 'arn:${AWS::Partition}:s3:::${bucketName}/*'
+                    - bucketName: !Ref PersonalizeBucket
+                Effect: Allow
+              - Action:
+                  - 's3:ListBucket'
+                  - 's3:GetBucketLocation'
+                  - 's3:GetLifecycleConfiguration'
+                  - 's3:PutLifecycleConfiguration'
+                Resource:
+                  - !Sub 
+                    - 'arn:${AWS::Partition}:s3:::${bucketName}'
+                    - bucketName: !Ref PersonalizeBucket
+                Effect: Allow
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+  putItemFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: |
+
+            // Create clients and set shared const values outside of the handler.
+
+            // Create a DocumentClient that represents the query to add an item
+            const dynamodb = require('aws-sdk/clients/dynamodb');
+            const docClient = new dynamodb.DocumentClient();
+
+            // Get the DynamoDB table name from environment variables
+            const tableName = process.env.SAMPLE_TABLE;
+
+            /**
+            * A simple example includes a HTTP post method to add one item to a DynamoDB table.
+            */
+            exports.putItemHandler = async (event) => {
+                if (event.httpMethod !== 'POST') {
+                    throw new Error(`postMethod only accepts POST method, you tried: ${event.httpMethod} method.`);
+                }
+                // All log statements are written to CloudWatch
+                console.info('received:', event);
+
+                // Get id and name from the body of the request
+                const body = JSON.parse(event.body)
+                const id = body.id;
+                const name = body.name;
+
+                // Creates a new item, or replaces an old item with a new item
+                // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#put-property
+                var params = {
+                    TableName : tableName,
+                    Item: { id : id, name: name }
+                };
+
+                const result = await docClient.put(params).promise();
+
+                const response = {
+                    statusCode: 200,
+                    headers: {
+                        'Access-Control-Allow-Headers': 'Content-Type',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                    },
+                    body: JSON.stringify(body)
+                };
+
+                // All log statements are written to CloudWatch
+                console.info(`response from: ${event.path} statusCode: ${response.statusCode} body: ${response.body}`);
+                return response;
+            }
+
+      FunctionName: putMusicFunction
+      Description: >-
+        A simple example includes a HTTP post method to add one item to a
+        DynamoDB table.
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+      MemorySize: 128
+      Environment:
+        Variables:
+          SAMPLE_TABLE: !Ref MusicTable
+      Handler: index.putItemHandler
+      Role: !GetAtt 
+        - putItemFunctionRole
+        - Arn
+      Timeout: 100
+      Runtime: nodejs16.x
+  getByIdFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: getByIdFunctionRolePolicy0
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:UpdateItem'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:DescribeTable'
+                  - 'dynamodb:ConditionCheckItem'
+                Resource:
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}
+                    - tableName: !Ref MusicTable
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*
+                    - tableName: !Ref MusicTable
+                Effect: Allow
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+  BatchRecommendationFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: BatchRecommendationFunctionRolePolicy0
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:UpdateItem'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:DescribeTable'
+                  - 'dynamodb:ConditionCheckItem'
+                Resource:
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}
+                    - tableName: !Ref MusicTable
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*
+                    - tableName: !Ref MusicTable
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}
+                    - tableName: !Ref BatchTable
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*
+                    - tableName: !Ref BatchTable
+                Effect: Allow
+        - PolicyName: BatchRecommendationFunctionRolePolicy1
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 's3:GetObject'
+                  - 's3:GetObjectAcl'
+                  - 's3:GetObjectVersion'
+                  - 's3:PutObject'
+                  - 's3:PutObjectAcl'
+                  - 's3:DeleteObject'
+                  - 's3:DeleteObjectTagging'
+                  - 's3:DeleteObjectVersionTagging'
+                  - 's3:GetObjectTagging'
+                  - 's3:GetObjectVersionTagging'
+                  - 's3:PutObjectTagging'
+                  - 's3:PutObjectVersionTagging'
+                Resource:
+                  - !Sub 
+                    - 'arn:${AWS::Partition}:s3:::${bucketName}/*'
+                    - bucketName: !Ref PersonalizeBucket
+                  - !Sub 
+                    - 'arn:${AWS::Partition}:s3:::${bucketName}/*'
+                    - bucketName: !Ref PersonalizeBatchBucket
+                Effect: Allow
+              - Action:
+                  - 's3:ListBucket'
+                  - 's3:GetBucketLocation'
+                  - 's3:GetLifecycleConfiguration'
+                  - 's3:PutLifecycleConfiguration'
+                Resource:
+                  - !Sub 
+                    - 'arn:${AWS::Partition}:s3:::${bucketName}'
+                    - bucketName: !Ref PersonalizeBucket
+                  - !Sub 
+                    - 'arn:${AWS::Partition}:s3:::${bucketName}'
+                    - bucketName: !Ref PersonalizeBatchBucket
+                Effect: Allow
+        - PolicyName: BatchRecommendationFunctionRolePolicy2
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - 'personalize:*'
+                Resource: '*'
+                Effect: Allow
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+  UserTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      ProvisionedThroughput:
+        WriteCapacityUnits: 2
+        ReadCapacityUnits: 2
+      TableName: User
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - KeyType: HASH
+          AttributeName: userId
+
+  ServerlessRestApi:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Body:
+        info:
+          version: '1.0'
+          title: !Ref 'AWS::StackName'
+        paths:
+          '/music/{id}':
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getByIdFunction.Arn}/invocations
+              responses: {}
+          /music:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${putItemFunction.Arn}/invocations
+              responses: {}
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getAllItemsFunction.Arn}/invocations
+              responses: {}
+          '/recommendation/{id}':
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RealtimeRecommendationFunction.Arn}/invocations
+              responses: {}
+          '/recommendation/batch/{id}':
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${BatchRecommendationFunction.Arn}/invocations
+              responses: {}
+          /user:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getAllUserFunction.Arn}/invocations
+              responses: {}
+          '/stream/beatoncloud-kinesis-stream-prd/record':
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${KinesisStreamFunction.Arn}/invocations
+              responses: {}
+            
+              
+        swagger: '2.0'
+      # Parameters:
+      #           endpointConfigurationTypes: REGIONAL
+  
+  ModelAPI:
+    Type: 'AWS::ApiGateway::Model'
+    Properties:
+      RestApiId: !Ref ServerlessRestApi
+      ContentType: application/json
+      Description: Schema for kinesis put
+      Name: Empty
+      Schema:
+        $schema: 'http://json-schema.org/draft-04/schema#'
+        title: Empty Schema
+        type: object
+
+  putItemFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: putItemFunctionRolePolicy0
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:UpdateItem'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:DescribeTable'
+                  - 'dynamodb:ConditionCheckItem'
+                Resource:
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}
+                    - tableName: !Ref MusicTable
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*
+                    - tableName: !Ref MusicTable
+                Effect: Allow
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+  ServerlessRestApiProdStage:
+    Type: 'AWS::ApiGateway::Stage'
+    Properties:
+      DeploymentId: !Ref ServerlessRestApiDeployment5e9547a85c
+      RestApiId: !Ref ServerlessRestApi
+      StageName: Prod
+  getAllUserFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: getAllUserFunctionRolePolicy0
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:UpdateItem'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:BatchGetItem'
+                  - 'dynamodb:DescribeTable'
+                  - 'dynamodb:ConditionCheckItem'
+                Resource:
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}
+                    - tableName: !Ref UserTable
+                  - !Sub 
+                    - >-
+                      arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*
+                    - tableName: !Ref UserTable
+                Effect: Allow
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+  
+  PersonalizeBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub beatoncloud-bucket-${AWS::AccountId}
+
+  PersonalizeBatchBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub beatoncloud-batchbucket-${AWS::AccountId}
+  
+  KinesisStream: 
+    Type: AWS::Kinesis::Stream 
+    Properties: 
+        Name: beatoncloud-kinesis-stream-prd 
+        RetentionPeriodHours: 24 
+        ShardCount: 1  
+
+
+  
+  getByIdFunctionApiPermissionProd:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref getByIdFunction
+      SourceArn: !Sub 
+        - >-
+          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/music/*
+        - __Stage__: '*'
+          __ApiId__: !Ref ServerlessRestApi
+
+  RealtimeRecommendationFunctionApiPermissionProd:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref RealtimeRecommendationFunction
+      SourceArn: !Sub 
+        - >-
+          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/recommendation/*
+        - __Stage__: '*'
+          __ApiId__: !Ref ServerlessRestApi
+  
+  EvenTrackerFunctionApiPermissionProd:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref KinesisStreamFunction
+      SourceArn: !Sub 
+        - >-
+          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/stream/*
+        - __Stage__: '*'
+          __ApiId__: !Ref ServerlessRestApi

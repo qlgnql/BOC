@@ -1,0 +1,454 @@
+{
+  "Music": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "51"
+          },
+          "title": {
+            "S": "이브, 프시케 그리고 푸른 수염의 아내"
+          },
+          "artist": {
+            "S": "LE SSERAFIM (르세라핌)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "52"
+          },
+          "title": {
+            "S": "심(心)"
+          },
+          "artist": {
+            "S": "DK(디셈버)"
+          },
+          "genre": {
+            "S": "Rock/Metal"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "53"
+          },
+          "title": {
+            "S": "취중고백"
+          },
+          "artist": {
+            "S": "김민석"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "54"
+          },
+          "title": {
+            "S": "Steal The Show (From “엘리멘탈”)"
+          },
+          "artist": {
+            "S": "Lauv"
+          },
+          "genre": {
+            "S": "POP"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "55"
+          },
+          "title": {
+            "S": "LOVE DIVE"
+          },
+          "artist": {
+            "S": "IVE (아이브)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "56"
+          },
+          "title": {
+            "S": "GODS"
+          },
+          "artist": {
+            "S": "NewJeans, League of Legends"
+          },
+          "genre": {
+            "S": "Game, Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "57"
+          },
+          "title": {
+            "S": "I Don't Think That I Like Her"
+          },
+          "artist": {
+            "S": "Charlie Puth"
+          },
+          "genre": {
+            "S": "POP"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "58"
+          },
+          "title": {
+            "S": "물론"
+          },
+          "artist": {
+            "S": "허각"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "59"
+          },
+          "title": {
+            "S": "After LIKE"
+          },
+          "artist": {
+            "S": "IVE (아이브)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "60"
+          },
+          "title": {
+            "S": "Bubble"
+          },
+          "artist": {
+            "S": "STAYC(스테이씨)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "61"
+          },
+          "title": {
+            "S": "주저하는 연인들을 위해"
+          },
+          "artist": {
+            "S": "잔나비"
+          },
+          "genre": {
+            "S": "Indie"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "62"
+          },
+          "title": {
+            "S": "해요 (2022)"
+          },
+          "artist": {
+            "S": "#안녕"
+          },
+          "genre": {
+            "S": "Ballad, Indie"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "63"
+          },
+          "title": {
+            "S": "다정히 내 이름을 부르면"
+          },
+          "artist": {
+            "S": "경서예지, 전건호"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "64"
+          },
+          "title": {
+            "S": "Last Christmas"
+          },
+          "artist": {
+            "S": "Ariana Grande"
+          },
+          "genre": {
+            "S": "POP"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "65"
+          },
+          "title": {
+            "S": "Do or Die"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "66"
+          },
+          "title": {
+            "S": "우리들의 블루스"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Ballad, Trot"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "67"
+          },
+          "title": {
+            "S": "Dangerously"
+          },
+          "artist": {
+            "S": "Charlie Puth"
+          },
+          "genre": {
+            "S": "POP"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "68"
+          },
+          "title": {
+            "S": "그대가 있는 곳, 언제 어디든"
+          },
+          "artist": {
+            "S": "로이킴"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "69"
+          },
+          "title": {
+            "S": "Dynamite"
+          },
+          "artist": {
+            "S": "방탄소년단"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "70"
+          },
+          "title": {
+            "S": "모든 날, 모든 순간 (Every day, Every Moment)"
+          },
+          "artist": {
+            "S": "폴킴"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "71"
+          },
+          "title": {
+            "S": "파이팅 해야지 (Feat. 이영지)"
+          },
+          "artist": {
+            "S": "부석순 (SEVENTEEN)"
+          },
+          "genre": {
+            "S": "Dance, R&B/Soul"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "72"
+          },
+          "title": {
+            "S": "Attention"
+          },
+          "artist": {
+            "S": "NewJeans"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "73"
+          },
+          "title": {
+            "S": "모래 알갱이"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "74"
+          },
+          "title": {
+            "S": "I Love My Body"
+          },
+          "artist": {
+            "S": "화사 (HWASA)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "75"
+          },
+          "title": {
+            "S": "손오공"
+          },
+          "artist": {
+            "S": "세븐틴 (SEVENTEEN)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    }
+  ]
+}

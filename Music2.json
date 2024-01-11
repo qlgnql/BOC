@@ -1,0 +1,454 @@
+{
+  "Music": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "26"
+          },
+          "title": {
+            "S": "퀸카 (Queencard)"
+          },
+          "artist": {
+            "S": "(여자)아이들"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "27"
+          },
+          "title": {
+            "S": "Standing Next to You"
+          },
+          "artist": {
+            "S": "정국"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "28"
+          },
+          "title": {
+            "S": "별 떨어진다 (I Do)"
+          },
+          "artist": {
+            "S": "디오 (D.O.)"
+          },
+          "genre": {
+            "S": "Rap/Hip-Hop"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "29"
+          },
+          "title": {
+            "S": "사랑은 늘 도망가"
+          },
+          "artist": {
+            "S": "임영웅"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "30"
+          },
+          "title": {
+            "S": "크리스마스니까"
+          },
+          "artist": {
+            "S": "성시경, 박효신, 이석훈, 서인국, VIXX (빅스)"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "31"
+          },
+          "title": {
+            "S": "Smoke (Prod. Dynamicduo, Padi)"
+          },
+          "artist": {
+            "S": "다이나믹 듀오, 이영지"
+          },
+          "genre": {
+            "S": "Rap/Hip-Hop"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "32"
+          },
+          "title": {
+            "S": "Get A Guitar"
+          },
+          "artist": {
+            "S": "RIIZE"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "33"
+          },
+          "title": {
+            "S": "화이트 (White)"
+          },
+          "artist": {
+            "S": "폴킴"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "34"
+          },
+          "title": {
+            "S": "사랑할 수밖에"
+          },
+          "artist": {
+            "S": "볼빨간사춘기"
+          },
+          "genre": {
+            "S": "Indie"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "35"
+          },
+          "title": {
+            "S": "어떻게 이별까지 사랑하겠어, 널 사랑하는 거지"
+          },
+          "artist": {
+            "S": "AKMU (악뮤)"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "36"
+          },
+          "title": {
+            "S": "Off The Record"
+          },
+          "artist": {
+            "S": "IVE (아이브)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "37"
+          },
+          "title": {
+            "S": "Santa Tell Me"
+          },
+          "artist": {
+            "S": "Ariana Grande"
+          },
+          "genre": {
+            "S": "POP"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "38"
+          },
+          "title": {
+            "S": "Fast Forward"
+          },
+          "artist": {
+            "S": "전소미"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "39"
+          },
+          "title": {
+            "S": "Discord"
+          },
+          "artist": {
+            "S": "QWER"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "40"
+          },
+          "title": {
+            "S": "사건의 지평선"
+          },
+          "artist": {
+            "S": "윤하 (YOUNHA)"
+          },
+          "genre": {
+            "S": "Rock/Metal"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "41"
+          },
+          "title": {
+            "S": "미리 메리 크리스마스 (Feat. 천둥 Of MBLAQ)"
+          },
+          "artist": {
+            "S": "아이유"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "42"
+          },
+          "title": {
+            "S": "사랑인가 봐"
+          },
+          "artist": {
+            "S": "멜로망스"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "43"
+          },
+          "title": {
+            "S": "사랑하지 않아서 그랬어"
+          },
+          "artist": {
+            "S": "임한별"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "44"
+          },
+          "title": {
+            "S": "OMG"
+          },
+          "artist": {
+            "S": "NewJeans"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "45"
+          },
+          "title": {
+            "S": "Spicy"
+          },
+          "artist": {
+            "S": "aespa"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "46"
+          },
+          "title": {
+            "S": "잠시라도 우리"
+          },
+          "artist": {
+            "S": "성시경, 나얼"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "47"
+          },
+          "title": {
+            "S": "음악의 신"
+          },
+          "artist": {
+            "S": "세븐틴 (SEVENTEEN)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "48"
+          },
+          "title": {
+            "S": "Chill Kill"
+          },
+          "artist": {
+            "S": "Red Velvet (레드벨벳)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "49"
+          },
+          "title": {
+            "S": "눈이 오잖아(Feat.헤이즈)"
+          },
+          "artist": {
+            "S": "이무진"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "50"
+          },
+          "title": {
+            "S": "Kitsch"
+          },
+          "artist": {
+            "S": "IVE (아이브)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    }
+  ]
+}
