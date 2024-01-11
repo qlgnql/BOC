@@ -6,6 +6,10 @@ on:
       - main
     types:
       - closed
+    paths-ignore:
+      - '.github/workflows/CloudFormation CD.yml'
+      - 'CloudFormation.yaml'
+      - 'README.md'
 
 jobs:
   build:
