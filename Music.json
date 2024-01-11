@@ -1,0 +1,454 @@
+{
+  "Music": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "1"
+          },
+          "title": {
+            "S": "Perfect Night"
+          },
+          "artist": {
+            "S": "LE SSERAFIM (르세라핌)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "2"
+          },
+          "title": {
+            "S": "첫 눈"
+          },
+          "artist": {
+            "S": "EXO"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "3"
+          },
+          "title": {
+            "S": "Drama"
+          },
+          "artist": {
+            "S": "aespa"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "4"
+          },
+          "title": {
+            "S": "To. X"
+          },
+          "artist": {
+            "S": "태연 (TAEYEON)"
+          },
+          "genre": {
+            "S": "R&B/Soul"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "5"
+          },
+          "title": {
+            "S": "헤어지자 말해요"
+          },
+          "artist": {
+            "S": "박재정"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "6"
+          },
+          "title": {
+            "S": "Baddie"
+          },
+          "artist": {
+            "S": "IVE (아이브)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "7"
+          },
+          "title": {
+            "S": "비의 랩소디"
+          },
+          "artist": {
+            "S": "임재현"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "8"
+          },
+          "title": {
+            "S": "인사"
+          },
+          "artist": {
+            "S": "범진"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "9"
+          },
+          "title": {
+            "S": "Love Lee"
+          },
+          "artist": {
+            "S": "AKMU (악뮤)"
+          },
+          "genre": {
+            "S": "Fork/Blues"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "10"
+          },
+          "title": {
+            "S": "Seven (feat. Latto) - Clean Ver."
+          },
+          "artist": {
+            "S": "정국"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "11"
+          },
+          "title": {
+            "S": "You & Me"
+          },
+          "artist": {
+            "S": "제니 (JENNIE)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "12"
+          },
+          "title": {
+            "S": "그대만 있다면 (여름날 우리 X 너드커넥션 (Nerd Connection))"
+          },
+          "artist": {
+            "S": "너드커넥션 (Nerd Connection)"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "13"
+          },
+          "title": {
+            "S": "I AM"
+          },
+          "artist": {
+            "S": "IVE (아이브)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "14"
+          },
+          "title": {
+            "S": "후라이의 꿈"
+          },
+          "artist": {
+            "S": "AKMU (악뮤)"
+          },
+          "genre": {
+            "S": "Fork/Blues"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "15"
+          },
+          "title": {
+            "S": "에피소드"
+          },
+          "artist": {
+            "S": "이무진"
+          },
+          "genre": {
+            "S": "Indie"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "16"
+          },
+          "title": {
+            "S": "Super Shy"
+          },
+          "artist": {
+            "S": "NewJeans"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "17"
+          },
+          "title": {
+            "S": "Ditto"
+          },
+          "artist": {
+            "S": "NewJeans"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "18"
+          },
+          "title": {
+            "S": "사막에서 꽃을 피우듯"
+          },
+          "artist": {
+            "S": "우디 (Woody)"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "19"
+          },
+          "title": {
+            "S": "ETA"
+          },
+          "artist": {
+            "S": "NewJeans"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "20"
+          },
+          "title": {
+            "S": "너의 모든 순간"
+          },
+          "artist": {
+            "S": "성시경"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "21"
+          },
+          "title": {
+            "S": "잘 지내자, 우리 (여름날 우리 X 로이킴)"
+          },
+          "artist": {
+            "S": "로이킴"
+          },
+          "genre": {
+            "S": "Ballad"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "22"
+          },
+          "title": {
+            "S": "Snowman"
+          },
+          "artist": {
+            "S": "Sia"
+          },
+          "genre": {
+            "S": "POP"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "23"
+          },
+          "title": {
+            "S": "Hype Boy"
+          },
+          "artist": {
+            "S": "NewJeans"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "24"
+          },
+          "title": {
+            "S": "Either Way"
+          },
+          "artist": {
+            "S": "IVE (아이브)"
+          },
+          "genre": {
+            "S": "Dance"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "25"
+          },
+          "title": {
+            "S": "All I Want for Christmas Is You"
+          },
+          "artist": {
+            "S": "Mariah Carey"
+          },
+          "genre": {
+            "S": "POP"
+          }
+        }
+      }
+    }
+  ]
+}
