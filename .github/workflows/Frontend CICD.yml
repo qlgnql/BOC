@@ -60,7 +60,7 @@ jobs:
         env: 
           CI: ""
       
-      - name: S3 버킷 비우기
+      - name: Empty S3 Bucket
         run: |
           account_id=$(aws sts get-caller-identity --output text --query 'Account')
           S3_NAME=$(aws s3api list-buckets --query "Buckets[?contains(Name, 'beatoncloud.com')].Name" --output text)
