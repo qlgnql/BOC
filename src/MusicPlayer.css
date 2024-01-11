@@ -1,0 +1,21 @@
+/* MusicPlayer.css */
+
+.album-cover {
+  width: 100px; /* Set the width as needed */
+  height: 100px; /* Set the height as needed */
+  border-radius: 50%;
+  overflow: hidden;
+  animation: spin 15s linear infinite; /* 5s duration, linear timing, infinite loop */
+  margin: 0 auto; /* Center align */
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
