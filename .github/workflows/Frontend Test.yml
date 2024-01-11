@@ -8,6 +8,7 @@ on:
       - '.github/workflows/CloudFormation CD.yml'
       - '.github/workflows/Frontend CICD.yml'
       - 'CloudFormation.yaml'
+      - 'README.md'
 
 jobs:
   build:
