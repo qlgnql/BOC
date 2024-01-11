@@ -20,6 +20,7 @@ const MusicPlayer = () => {
     { title: '다정히내이름을부르면', file: process.env.PUBLIC_URL + '/callmyname.mp3', cover: '/image/callmyname.jpg' },
     { title: '인사', file: process.env.PUBLIC_URL + '/hello.mp3', cover: '/image/hello.jpg' },
     { title: 'Super shy', file: process.env.PUBLIC_URL + '/supershy.mp3', cover: '/image/supershy.jpg' },
+    { title: '파이팅 해야지', file: process.env.PUBLIC_URL + '/fighting.mp3', cover: '/image/fighting.jpg' },
     
     // ... (이전 코드는 그대로 유지)
   ];
