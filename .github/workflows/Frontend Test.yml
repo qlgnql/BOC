@@ -1,0 +1,82 @@
+name: Frontend Test
+
+on:
+  pull_request:
+    branches:
+      - develop
+    paths-ignore:
+      - '.github/workflows/CloudFormation CD.yml'
+      - '.github/workflows/Frontend CICD.yml'
+      - 'CloudFormation.yaml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.20.2]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+    
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+    
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+    
+      - name: Install Node.js dependencies
+        run: npm install --force
+    
+      - name: Configure AWS credentials
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} &&
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} &&
+          aws configure set region ${{ secrets.AWS_REGION }}
+    
+      - name: Add execute permission to the script
+        run: chmod +x uploadDataToDynamoDB.sh
+    
+      - name: Run custom script
+        run: sh uploadDataToDynamoDB.sh
+    
+      - name: Get API Gateway endpoint
+        run: |
+          API_ID=$(aws cloudformation describe-stacks --stack-name beatoncloud --query "Stacks[0].Outputs[?OutputKey=='APIEndpoint'].OutputValue" --output text)
+          echo "{\"ApiUrl\": \"$API_ID\"}" > src/config.json
+    
+      - name: Build project
+        run: npm run build
+        env: 
+          CI: ""
+
+      - name: If build fail
+      # 이전 step이 실패한 경우에만 이 step을 실행시키는 syntax
+        if: ${{ failure() }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const pull_number = ${{ github.event.pull_request.number }}
+            const updated_title = `[BUILD FAIL] ${{ github.event.pull_request.title }}`
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pull_number,
+              body: '빌드에 실패했습니다.',
+              event: 'REQUEST_CHANGES'
+            })
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pull_number,
+              title: updated_title,
+              state: 'closed'
+            })
