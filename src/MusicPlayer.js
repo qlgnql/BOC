@@ -1,3 +1,5 @@
+//Music Player 최종본 (좋아요 표시 사라짐)
+
 import React, { useState, useRef, useEffect } from 'react';
 import './MusicPlayer.css';
 
