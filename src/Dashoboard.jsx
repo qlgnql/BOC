@@ -29,7 +29,6 @@ function Dashboard() {
                 <Menu.Item as={NavLink} to='/' exact>BeatOnCloud</Menu.Item>
                 </Menu.Menu>
                 <Menu.Menu position='right'>
-                <Menu.Item link>Contact to us</Menu.Item>
                 <Menu.Item link onClick={toggleMusicPlayer}>Music Player</Menu.Item>
                 <Menu.Item link onClick={onLogout}>Log out</Menu.Item>
                 </Menu.Menu>
