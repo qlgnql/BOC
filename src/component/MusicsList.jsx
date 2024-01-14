@@ -33,7 +33,7 @@ function MusicsList() {
   
     document.title = 'BeatOncloud';
     return (
-      <Container style={{ marginTop: 70 }}>
+      <Container style={{ paddingTop: 70 }}>
         <MusicsListCardGroup items={musics} pageViewOrigin='Browse'/>
       </Container>
     );
