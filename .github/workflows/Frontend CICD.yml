@@ -6,6 +6,10 @@ on:
       - main
     types:
       - closed
+    paths-ignore:
+      - '.github/workflows/CloudFormation CD.yml'
+      - 'CloudFormation.yaml'
+      - 'README.md'
 
 jobs:
   build:
@@ -55,6 +59,12 @@ jobs:
         run: npm run build
         env: 
           CI: ""
+      
+      - name: Empty S3 Bucket
+        run: |
+          account_id=$(aws sts get-caller-identity --output text --query 'Account')
+          S3_NAME=$(aws s3api list-buckets --query "Buckets[?contains(Name, 'beatoncloud.com')].Name" --output text)
+          aws s3 rm s3://$S3_NAME --recursive
 
       - name: Frontend Deploy to S3
         run: |
