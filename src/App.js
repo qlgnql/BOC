@@ -3,7 +3,7 @@ import './App.css';
 
 // React 라우터, UI 라이브러리
 
-import Dashboard from './Dashoboard'
+import Dashboard from './Dashboard'
 
 // To store login userid info, app uses Context Provide
 import { AuthContext } from './context/Auth.context.jsx';
