@@ -90,7 +90,7 @@ function MusicDetails({ id, locationState }) {
     }, []);
   
     return (
-      <Container>
+      <Container style={{ paddingTop: 70 }}>
         <NavLink to='/'><Icon name='arrow left'/>Back to Music list</NavLink>
         <Divider hidden/>
         <Card key={music.id} style={{ width: '100%', maxWidth: 720, minHeight: 100, margin: 'auto' }}>
