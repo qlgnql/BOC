@@ -20,8 +20,9 @@ jobs:
       id: commit_message
       run: |
         COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-        echo "commit_message=${COMMIT_MESSAGE}" >> $GITHUB_ENV
-
+        echo "commit_message=\"${COMMIT_MESSAGE}\"" >> $GITHUB_ENV
+      shell: bash
+    
     - name: Create Pull Request to main
       if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'develop'
       uses: peter-evans/create-pull-request@v3
