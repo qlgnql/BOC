@@ -2,6 +2,8 @@ name: Auto-Generate PR from develop to main
 
 on:
   pull_request:
+    branches:
+      - develop
     types:
       - closed
 
@@ -17,7 +19,7 @@ jobs:
       run: echo "PR ${{ github.event.pull_request.number }} ${{ github.event.pull_request.state }}"
 
     - name: Create Pull Request to main
-      if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'develop'
+      if: github.event.pull_request.merged == true
       uses: peter-evans/create-pull-request@v3
       with:
         github_token: ${{ secrets.PAT_CREATE_PULL_REQUEST }}

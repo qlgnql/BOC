@@ -1,6 +1,11 @@
 name: Auto-Generate PR from branch to develop
 
-on: push
+on:
+  push:
+    branches:
+      - '!main'
+      - '!develop'
+
 
 jobs:
   generate-pr:
