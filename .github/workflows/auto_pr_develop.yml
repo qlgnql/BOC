@@ -3,6 +3,7 @@ name: Auto-Generate PR from branch to develop
 on:
   push:
     branches:
+      - '*'
       - '!main'
       - '!develop'
 
