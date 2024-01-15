@@ -120,7 +120,7 @@ const MusicPlayer = () => {
   }, [currentSongIndex]);
 
   return (
-    <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', height: '230px', backgroundColor: '#F8F8FF', padding: '10px', color: '#000000' }}>
+    <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', height: '240px', backgroundColor: '#F8F8FF', padding: '10px', color: '#000000' }}>
       <h3 style={{ marginBottom: '10px' }}>
         Music Player
       </h3>
