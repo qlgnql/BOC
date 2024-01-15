@@ -20,6 +20,7 @@ jobs:
       if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'develop'
       uses: peter-evans/create-pull-request@v3
       with:
+        github_token: ${{ secrets.PAT_CREATE_PULL_REQUEST }}
         branch: auto-pr-develop-to-main-${{ github.run_number }}
         title: Automatically Generated PR from develop to main
         body: |
@@ -29,5 +30,3 @@ jobs:
           - Automatically generated changes...
 
         labels: auto-generated
-      env:
-        github_token: ${{ secrets.PAT_CREATE_PULL_REQUEST }}
