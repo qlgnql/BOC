@@ -7,8 +7,8 @@ on:
     paths-ignore:
       - '.github/workflows/CloudFormation CD.yml'
       - '.github/workflows/Frontend CICD.yml'
-      - '.github/workflows/Auto_PR_develop.yml'
-      - '.github/workflows/Auto_PR_main.yml'
+      - '.github/workflows/auto_pr_develop.yml'
+      - '.github/workflows/auto_pr_main.yml'
       - 'CloudFormation.yaml'
       - 'README.md'
 
