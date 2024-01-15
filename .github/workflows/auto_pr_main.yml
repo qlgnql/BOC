@@ -1,0 +1,33 @@
+name: Auto-Generate PR from develop to main
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  generate-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Check if PR is merged to develop
+      run: echo "PR ${{ github.event.pull_request.number }} ${{ github.event.pull_request.state }}"
+
+    - name: Get latest commit message from develop
+      id: commit_message
+      run: |
+        COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+        echo "commit_message=${COMMIT_MESSAGE}" >> $GITHUB_ENV
+
+    - name: Create Pull Request to main
+      if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'develop'
+      uses: peter-evans/create-pull-request@v3
+      with:
+        branch: auto-pr-develop-to-main-${{ github.run_number }}
+        title: ${{ env.commit_message }}
+        labels: auto-generated
+      env:
+        github_token: ${{ secrets.PAT_CREATE_PULL_REQUEST }}
