@@ -2,6 +2,8 @@ name: Auto-Generate PR from develop to main
 
 on:
   pull_request:
+    branches:
+      - develop
     types:
       - closed
 
@@ -13,21 +15,12 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Check if PR is merged to develop
-      run: echo "PR ${{ github.event.pull_request.number }} ${{ github.event.pull_request.state }}"
-
-    - name: Get latest commit message from develop
-      id: commit_message
-      run: |
-        COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-        echo "commit_message=${COMMIT_MESSAGE}" >> $GITHUB_ENV
-
-    - name: Create Pull Request to main
-      if: github.event.pull_request.merged && github.event.pull_request.base.ref == 'develop'
-      uses: peter-evans/create-pull-request@v3
+    - name: Create pull request to main
+      if: github.event.pull_request.merged == true
+      uses: thomaseizinger/create-pull-request@master
       with:
-        branch: auto-pr-develop-to-main-${{ github.run_number }}
-        title: ${{ env.commit_message }}
-        labels: auto-generated
-      env:
         github_token: ${{ secrets.PAT_CREATE_PULL_REQUEST }}
+        head: develop
+        base: main
+        title: "Auto-Generated PR from develop to main"
+        labels: auto-generated
