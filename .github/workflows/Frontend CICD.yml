@@ -8,6 +8,8 @@ on:
       - closed
     paths-ignore:
       - '.github/workflows/CloudFormation CD.yml'
+      - '.github/workflows/Auto_PR_develop.yml'
+      - '.github/workflows/Auto_PR_main.yml'
       - 'CloudFormation.yaml'
       - 'README.md'
 
