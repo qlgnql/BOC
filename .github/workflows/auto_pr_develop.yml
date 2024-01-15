@@ -11,7 +11,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Create pull request
-      if: github.ref != 'refs/heads/develop'
+      if: "!startsWith(github.ref, 'refs/heads/main')"
       uses: thomaseizinger/create-pull-request@master
       with:
         github_token: ${{ secrets.PAT_CREATE_PULL_REQUEST }}
