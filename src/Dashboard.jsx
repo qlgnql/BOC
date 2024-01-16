@@ -24,7 +24,7 @@ function Dashboard() {
             <Router>
                 <Menu fixed='top' color='goldenrod' inverted>
                     <Menu.Menu>
-                        <Menu.Item as={NavLink} to='/' exact>BeatOnCloud</Menu.Item>
+                        <Menu.Item as={NavLink} to='/' exact>woogieonxon</Menu.Item>
                     </Menu.Menu>
                     <Menu.Menu position='right'>
                         <Menu.Item link onClick={toggleMusicPlayer}>Music Player</Menu.Item>
